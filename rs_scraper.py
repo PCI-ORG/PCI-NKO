@@ -40,7 +40,7 @@ def scrape_rodong_sinmun(start_date, end_date=None):
         path_year = date.strftime("%Y")
         path_month = date.strftime("%m")
         formatted_date = get_formatted_date(date)
-        url = f'https://kcnawatch.org/wp-content/uploads/sites/5/{path_year}/{path_month}/wpid-rodong-{formatted_date}.pdf'
+        url = f'https://kcnawatch.org/wp-content/uploads/sites/5/{path_year}/{path_month}/rodong-{formatted_date}.pdf'
         if download_pdf(url, output_dir, formatted_date):
             download_count += 1
         time.sleep(0.5)
