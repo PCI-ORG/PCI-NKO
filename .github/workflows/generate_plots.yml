@@ -29,6 +29,7 @@ jobs:
       run: |
         cd docs/plot1
         python pci_nko_fg1.py
+        ls -la 
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3

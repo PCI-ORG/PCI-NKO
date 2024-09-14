@@ -16,9 +16,10 @@ def create_nko_plotly_figure():
         "y": results['difference'] if 'difference' in results.columns else results.iloc[:, -1],
         "x": pd.to_datetime(results['Pred End'] if 'Pred End' in results.columns else results.iloc[:, 0]),
     })
-    # Format the date for data points
-    df['label'] = df.x.dt.strftime('%m/%d/%Y') + df.y.apply(lambda x: f"<br>PCI for North Korea: {x:.4f}")
     df = df.sort_values(by='x')
+
+    # Create hover text
+    df['text'] = df.x.dt.strftime('%Y-%m-%d') + '<br>PCI: ' + df.y.round(4).astype(str)
 
     # Hard-coded events
     events = pd.DataFrame({
@@ -42,7 +43,7 @@ def create_nko_plotly_figure():
             "Further signal of Kim Jong Un's daughter as a potential successor"
         ]
     })
-    events['formatted_text'] = events['date'].dt.strftime('%m/%d/%Y') + '<br>' + events['text']
+    events['formatted_text'] = events['date'].dt.strftime('%Y-%m-%d') + '<br>' + events['text']
 
     # Calculate the appropriate x-axis range
     x_min = min(df.x.min(), events['date'].min())
@@ -53,18 +54,24 @@ def create_nko_plotly_figure():
     x_max += pd.Timedelta(days=30)
 
     # Create traces
-    trace_main = go.Scatter(x=df.x, y=df.y, text=df.label, hoverinfo="text", name="PCI")
+    trace_main = go.Scatter(
+        x=df.x.tolist(),  # Convert to list of datetime objects
+        y=df.y.tolist(),
+        text=df.text.tolist(),
+        hoverinfo="text",
+        name="PCI"
+    )
+
     trace_events = go.Scatter(
-        x=events.date, 
-        y=[df.y.max()] * len(events), 
-        text=events.formatted_text,
-        hoverinfo="text", 
-        mode='markers', 
+        x=events.date.tolist(),  # Convert to list of datetime objects
+        y=[df.y.max()] * len(events),
+        text=events.formatted_text.tolist(),
+        hoverinfo="text",
+        mode='markers',
         marker=dict(opacity=0),
         name="Events",
         hovertemplate="<b>%{text}</b><extra></extra>",
     )
-    
 
     # Create shapes for event lines
     shapes = [dict(
@@ -73,12 +80,11 @@ def create_nko_plotly_figure():
         x0=date, x1=date,
         y0=0, y1=0.15,
         xref="x", yref="y"
-    ) for date in events.date]
-
+    ) for date in events.date.tolist()]
 
     # Add horizontal line at y=0
     trace_horizontal = go.Scatter(
-        x=[0, x_max],
+        x=[x_min, x_max],
         y=[0, 0],
         mode='lines',
         line=dict(color='black', dash='dash'),
@@ -88,6 +94,7 @@ def create_nko_plotly_figure():
 
     # Layout
     layout = go.Layout(
+        # title="Policy Change Index for North Korea",
         showlegend=False,
         hovermode="x",
         hoverdistance=16,
@@ -97,13 +104,6 @@ def create_nko_plotly_figure():
             linecolor='black',
             range=[min(df.y.min(), -0.01), max(df.y.max(), 0.16)],
             zeroline=False
-        ),
-        margin=go.layout.Margin(
-            l=50,
-            r=0,
-            b=50,
-            t=50,
-            pad=4
         ),
         shapes=shapes,
         hoverlabel=dict(
@@ -130,12 +130,12 @@ def create_nko_plotly_figure():
         )
     )
 
-
     # Create figure
     fig = go.Figure(data=[trace_main, trace_events, trace_horizontal], layout=layout)
 
     # Save the figure as an HTML file
-    fig.write_html("plot.html", full_html=False, include_plotlyjs='cdn')
+    fig.write_html("plot.html", full_html=True, include_plotlyjs='cdn')
+    print("Plot saved as plot.html")
 
 if __name__ == "__main__":
     create_nko_plotly_figure()
