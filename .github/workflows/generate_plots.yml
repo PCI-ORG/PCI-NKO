@@ -1,4 +1,4 @@
-name: Generate Plots and Deploy to GitHub Pages
+name: Generate Plots and Deploy to GitHub Pages for PCI-NKO
 
 on:
   push:
