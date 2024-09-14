@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCI for North Korea</title>
+</head>
+<body>
+    <h1>Policy Change Index for North Korea</h1>
+    <div id="plot-container"></div>
+    <script>
+        fetch('plot1/plot.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('plot-container').innerHTML = html;
+            });
+    </script>
+</body>
+</html>
