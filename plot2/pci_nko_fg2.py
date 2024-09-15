@@ -26,10 +26,9 @@ def plot_policy_percentages(csv_file, output_path):
                            visible=True)
             )
 
-    # Update layout
+    # Update layout with reduced margin to avoid empty space
     fig.update_layout(
-        # title='Percentage of Articles by Policy Area Over Time',
-        # xaxis_title='Date',
+        margin=dict(l=50, r=50, t=20, b=50),  # Adjust top margin to reduce empty space
         yaxis_title='Monthly Percentage of Articles per Policy Area',
         legend_title='Policy Area',
         hovermode='x unified',
@@ -40,36 +39,37 @@ def plot_policy_percentages(csv_file, output_path):
         ),
         yaxis=dict(
             tickformat='.1f',
-            ticksuffix='%'),
-        
-        )
+            ticksuffix='%'
+        ),
+    )
 
     # Add buttons for selecting all or none
-    fig.update_layout(dict(updatemenus=[
-                        dict(
-                            type = "buttons",
-                            direction = "left",
-                            buttons=list([
-                                dict(
-                                    args=["visible", "legendonly"],
-                                    label="Unselect All",
-                                    method="restyle"
-                                ),
-                                dict(
-                                    args=["visible", True],
-                                    label="Select All",
-                                    method="restyle"
-                                )
-                            ]),
-                            pad={"r": 10, "t": 10},
-                            showactive=False,
-                            x=1.25,
-                            xanchor="right",
-                            y=1.05,
-                            yanchor="top"
-                        ),
-                    ]
-              ))
+    fig.update_layout(
+        updatemenus=[
+            dict(
+                type="buttons",
+                direction="left",
+                buttons=[
+                    dict(
+                        args=["visible", "legendonly"],
+                        label="Unselect All",
+                        method="restyle"
+                    ),
+                    dict(
+                        args=["visible", True],
+                        label="Select All",
+                        method="restyle"
+                    )
+                ],
+                pad={"r": 10, "t": 10},
+                showactive=False,
+                x=1.25,
+                xanchor="right",
+                y=1.05,
+                yanchor="top"
+            ),
+        ]
+    )
 
 
     # Add vertical line at 2022-01 with hover text
