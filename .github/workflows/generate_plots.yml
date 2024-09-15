@@ -33,7 +33,7 @@ jobs:
 
     - name: Run Plot2 script
       run: |
-        cd ../plot2
+        cd docs/plot2
         python pci_nko_fg2.py
         ls -la
 
@@ -41,4 +41,4 @@ jobs:
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs
+        publish_dir: docs
