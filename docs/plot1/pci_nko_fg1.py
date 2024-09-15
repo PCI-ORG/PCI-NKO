@@ -95,6 +95,7 @@ def create_nko_plotly_figure():
     # Layout
     layout = go.Layout(
         # title="Policy Change Index for North Korea",
+        margin=dict(l=50, r=50, t=20, b=50), 
         showlegend=False,
         hovermode="x",
         hoverdistance=16,
