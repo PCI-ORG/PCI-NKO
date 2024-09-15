@@ -25,11 +25,17 @@ jobs:
         python -m pip install --upgrade pip
         pip install pandas plotly
 
-    - name: Generate plot
+    - name: Run Plot1 script
       run: |
         cd docs/plot1
         python pci_nko_fg1.py
         ls -la 
+
+    - name: Run Plot2 script
+      run: |
+        cd ../plot2
+        python pci_nko_fg2.py
+        ls -la
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
