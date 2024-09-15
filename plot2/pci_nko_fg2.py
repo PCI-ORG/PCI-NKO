@@ -38,7 +38,7 @@ def plot_policy_percentages(csv_file, output_path):
             nticks=20,
         ),
         yaxis=dict(
-            tickformat='.1f',
+            tickformat='d',
             ticksuffix='%'
         ),
     )
@@ -63,10 +63,10 @@ def plot_policy_percentages(csv_file, output_path):
                 ],
                 pad={"r": 10, "t": 10},
                 showactive=False,
-                x=1.25,
-                xanchor="right",
+                x=0.5,
+                xanchor="center",
                 y=1.05,
-                yanchor="top"
+                yanchor="bottom"
             ),
         ]
     )
