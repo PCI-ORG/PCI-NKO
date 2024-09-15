@@ -1,2 +1,3 @@
-# rodong_reader
-Convert the PDF scanned version of Rodong Sinmum into separate articles
+# Policy Change Index for North Korea (PCI-NKO)
+
+The Policy Change Index for North Korea (PCI-NKO) is an innovative project that aims to predict North Korea's policy changes by analyzing its state propaganda. The PCI-NKO utilizes deep learning and large language models (LLMs) to detect and interpret changes in how the _Rodong Sinmun_, North Korea's official newspaper, prioritizes different policies. The method involves collecting and labeling _Rodong Sinmun_ articles, training a deep learning model to predict front-page articles, deploying the model to assess editorial changes, and using LLMs to interpret anomalies. This approach results in a monthly index that measures shifts in editorial priorities, potentially signaling upcoming policy changes.
