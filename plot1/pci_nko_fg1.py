@@ -134,7 +134,7 @@ def create_nko_plotly_figure():
     fig = go.Figure(data=[trace_main, trace_events, trace_horizontal], layout=layout)
 
     # Save the figure as an HTML file
-    fig.write_html("plot.html", full_html=True, include_plotlyjs='cdn')
+    fig.write_html("plot1.html", full_html=True, include_plotlyjs='cdn')
     print("Plot saved as plot.html")
 
 if __name__ == "__main__":
