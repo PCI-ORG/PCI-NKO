@@ -1,0 +1,29 @@
+name: PCI-NKO-CUDA
+channels:
+  - defaults
+  - conda-forge
+  - pytorch
+dependencies:
+  - python=3.12
+  - python-dotenv
+  - pandas
+  - plotly
+  - transformers
+  - torch
+  - cudatoolkit=12.1  # Please change to your CUDA version
+  - optuna
+  - jupyterlab
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - nltk
+  - spacy
+  - tqdm
+  - pip:
+    - datasets
+    - evaluate
+    - openai
+    - langchain
+    - sentence-transformers
+    - python-docx
+    # Add any additional pip packages if necessary

@@ -101,7 +101,7 @@ def create_nko_plotly_figure():
         hoverdistance=16,
         spikedistance=-1,
         yaxis=dict(
-            title="Monthly PCI for North Korea",
+            title="Monthly PCI for North Korea (PCI-NKO)",
             linecolor='black',
             range=[min(df.y.min(), -0.01), max(df.y.max(), 0.16)],
             zeroline=False

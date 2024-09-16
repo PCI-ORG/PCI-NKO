@@ -1,0 +1,28 @@
+name: PCI-NKO
+channels:
+  - defaults
+  - conda-forge
+  - pytorch
+dependencies:
+  - python=3.12
+  - python-dotenv
+  - pandas
+  - plotly
+  - transformers
+  - torch
+  - optuna
+  - jupyterlab
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - nltk
+  - spacy
+  - tqdm
+  - pip:
+    - datasets
+    - evaluate
+    - openai
+    - langchain
+    - sentence-transformers
+    - python-docx 
+    # Add any additional pip packages if necessary
