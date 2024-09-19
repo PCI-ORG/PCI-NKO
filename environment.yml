@@ -1,26 +1,24 @@
-name: PCI-NKO-CUDA
+name: PCI-NKO-Test
 channels:
   - defaults
   - conda-forge
-  - pytorch
 dependencies:
   - python=3.12
   - python-dotenv
+  - python-dateutil
   - pandas
   - plotly
-  - transformers
-  - torch
-  - cudatoolkit=12.1  # Please change to your CUDA version
   - optuna
   - jupyterlab
+  - ipywidgets
   - scikit-learn
   - matplotlib
   - seaborn
   - nltk
   - spacy
   - tqdm
+  - pip
   - pip:
-    - datasets
     - evaluate
     - openai
     - langchain

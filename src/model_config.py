@@ -6,12 +6,12 @@ import torch
 import sys
 import os
 
-# Model Checkpoint
+# Model Checkpoint and training schema
 MODEL_CHECKPOINT = "klue/roberta-base" # Alternative: "kykim/albert-kor-base"
 INITIAL_TRAIN_START = "2018-01-01"
 INITIAL_TRAIN_YEARS = 4 #year(s)
 FINAL_TRAIN_START = "2019-11-01"
-PREDICTION_PERIOD = 3 # months
+PREDICTION_PERIOD = 3# months
 STEP_MONTHS = 1 # month(s)
 MAX_PRED_END = "2024-02-01" 
 

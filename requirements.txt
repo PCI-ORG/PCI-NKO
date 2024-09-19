@@ -1,0 +1,22 @@
+python-dotenv
+pandas
+plotly
+transformers
+torch  # PyTorch without specifying CUDA here; installed manually later
+optuna
+jupyterlab
+ipywidgets
+scikit-learn
+matplotlib
+seaborn
+nltk
+spacy
+tqdm
+datasets
+evaluate
+openai
+langchain
+sentence-transformers
+python-docx
+python-dateutil
+

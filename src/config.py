@@ -1,24 +1,26 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
 # Load environment variables from .env
 load_dotenv()
 
-# Project Folder
-PROJ_FOLDER = os.getenv("PROJ_FOLDER")
-LOGS_FOLDER = os.getenv("LOGS_FOLDER")
-HYPERPARAMETER_SEARCH_LOGS = os.getenv("HYPERPARAMETER_SEARCH_LOGS")
-FULL_TRAINING_LOGS = os.getenv("FULL_TRAINING_LOGS")
-ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
-CUDA_VISIBLE_DEVICES = os.getenv("CUDA_VISIBLE_DEVICES") 
+# Project Folders
+PROJ_FOLDER = Path('/your/project/folder') # Set this to your project folder
+LOGS_FOLDER = PROJ_FOLDER / "logs"
+HYPERPARAMETER_SEARCH_LOGS = LOGS_FOLDER / "hyperparameter_search_logs"
+FULL_TRAINING_LOGS = LOGS_FOLDER / "full_training_logs"
 
-# Check if all required environment variables are set
-required_vars = ["PROJ_FOLDER", "LOGS_FOLDER", "HYPERPARAMETER_SEARCH_LOGS", "FULL_TRAINING_LOGS"]
-missing_vars = [var for var in required_vars if not os.getenv(var)]
+# Ensure directories exist
+for folder in [LOGS_FOLDER, HYPERPARAMETER_SEARCH_LOGS, FULL_TRAINING_LOGS]:
+    folder.mkdir(parents=True, exist_ok=True)
 
-if missing_vars:
-    raise EnvironmentError(f"Missing required environment variables: {', '.join(missing_vars)}")
+# CUDA configuration
+CUDA_VISIBLE_DEVICES = os.getenv("CUDA_VISIBLE_DEVICES")
 
 # Set CUDA_VISIBLE_DEVICES if available
 if CUDA_VISIBLE_DEVICES:
     os.environ["CUDA_VISIBLE_DEVICES"] = CUDA_VISIBLE_DEVICES
+
+# This line will be added by corpus_preparation.py
+# WHOLE_SETS_PATH = Path('...')

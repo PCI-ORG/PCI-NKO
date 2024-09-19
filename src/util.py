@@ -1,11 +1,54 @@
 import os
 import json
 import numpy as np
+from collections import deque
+from transformers import TrainerCallback
 from datasets import load_from_disk
 import evaluate as ev
 from config import PROJ_FOLDER, LOGS_FOLDER, HYPERPARAMETER_SEARCH_LOGS, FULL_TRAINING_LOGS
 from model_config import model_name, scheme_name, model_init, get_tokenizer
 
+class LoggingCallback(TrainerCallback):
+    def __init__(self, log_file='training_logs.jsonl', max_memory_entries=1000):
+        self.log_file = log_file
+        self.max_memory_entries = max_memory_entries
+        self.training_logs = deque(maxlen=max_memory_entries)
+        self.eval_logs = deque(maxlen=max_memory_entries)
+
+    def on_log(self, args, state, control, logs=None, **kwargs):
+        if state.is_local_process_zero:
+            if 'loss' in logs:
+                log_entry = {'step': state.global_step, 'loss': logs['loss']}
+                print(f"Step {state.global_step}: Loss = {logs['loss']:.4f}")
+                self.training_logs.append(log_entry)
+                self._write_to_file(log_entry)
+            if 'eval_f1' in logs:
+                log_entry = {'step': state.global_step, 'eval_f1': logs['eval_f1']}
+                print(f"Step {state.global_step}: Eval F1 = {logs['eval_f1']:.4f}")
+                self.eval_logs.append(log_entry)
+                self._write_to_file(log_entry)
+
+    def _write_to_file(self, log_entry):
+        with open(self.log_file, 'a') as f:
+            f.write(json.dumps(log_entry) + '\n')
+
+    def get_recent_logs(self):
+        return {
+            'training': list(self.training_logs),
+            'evaluation': list(self.eval_logs)
+        }
+
+def read_logs(log_file='training_logs.jsonl'):
+    training_logs = []
+    eval_logs = []
+    with open(log_file, 'r') as f:
+        for line in f:
+            log_entry = json.loads(line)
+            if 'loss' in log_entry:
+                training_logs.append(log_entry)
+            elif 'eval_f1' in log_entry:
+                eval_logs.append(log_entry)
+    return {'training': training_logs, 'evaluation': eval_logs}
 
 def create_logs_folders():
     os.makedirs(LOGS_FOLDER, exist_ok=True)

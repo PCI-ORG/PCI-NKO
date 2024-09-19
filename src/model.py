@@ -3,13 +3,14 @@ import json
 import optuna
 import argparse
 import evaluate
+import random
 from transformers import Trainer, TrainingArguments, EarlyStoppingCallback
 from datasets import load_from_disk
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import pandas as pd
 import torch
-from util import create_logs_folders, compute_metrics, save_best_model, load_best_hyperparams, preprocess_function
+from util import create_logs_folders, compute_metrics, save_best_model, load_best_hyperparams, LoggingCallback, read_logs, preprocess_function
 from config import PROJ_FOLDER, HYPERPARAMETER_SEARCH_LOGS, FULL_TRAINING_LOGS
 from model_config import MODEL_CHECKPOINT, NUM_LABELS, MAX_LENGTH, MAX_ATTEMPTS, N_TRIALS, INITIAL_TRAIN_START, model_name, scheme_name, model_path, get_tokenizer, get_device, model_init, get_optuna_settings
 from datasets_preparation import prepare_datasets, save_datasets
@@ -33,10 +34,11 @@ def get_previous_date_str(start_date_str, step_months=1, initial_train_start=INI
 
 def run_hyperparameter_search(start_date_str,
                               encoded_dataset,  
+                              random_seed,
                               n_trials=N_TRIALS):
     create_logs_folders()
     # Calculate previous hyperparameters path
-    previous_date_str= get_previous_date_str(start_date_str)
+    previous_date_str = get_previous_date_str(start_date_str)
     initial_hyperparams = None # Alternative: load_best_hyperparams(previous_date_str)
     
     if not initial_hyperparams:
@@ -47,9 +49,12 @@ def run_hyperparameter_search(start_date_str,
         output_dir = os.path.join(HYPERPARAMETER_SEARCH_LOGS, model_name, scheme_name, start_date_str)
         os.makedirs(output_dir, exist_ok=True)
         
+        log_file = os.path.join(output_dir, f'hyperparameter_search_trial_{trial.number}.jsonl')
+        logging_callback = LoggingCallback(log_file=log_file)
+        
         search_args = TrainingArguments(
             output_dir=output_dir,
-            evaluation_strategy="epoch",
+            eval_strategy="epoch",
             save_strategy="epoch",
             load_best_model_at_end=True,
             metric_for_best_model="f1", 
@@ -58,7 +63,7 @@ def run_hyperparameter_search(start_date_str,
             logging_strategy="epoch",
             save_total_limit=2,
             report_to=None,
-            seed=42,
+            seed=random_seed,  # Use the provided random seed
             **hyperparams  
         )
         
@@ -70,7 +75,7 @@ def run_hyperparameter_search(start_date_str,
             eval_dataset=encoded_dataset["validate"],
             tokenizer=tokenizer,
             compute_metrics=compute_metrics,
-            callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
+            callbacks=[EarlyStoppingCallback(early_stopping_patience=3), logging_callback]
         )
         
         search_trainer.train()
@@ -78,9 +83,8 @@ def run_hyperparameter_search(start_date_str,
         
         return eval_results["eval_f1"]
 
-    study = optuna.create_study(direction="maximize", study_name="Model Hyperparameter Optimization")
+    study = optuna.create_study(direction="maximize", study_name="Model Hyperparameter Optimization", sampler=optuna.samplers.TPESampler(seed=random_seed))
     study.optimize(objective, n_trials=n_trials, gc_after_trial=True)
-
 
     print("Number of finished trials: ", len(study.trials))
     print("Best trial:")
@@ -90,30 +94,44 @@ def run_hyperparameter_search(start_date_str,
     for key, value in trial.params.items():
         print(f"    {key}: {value}")
 
-    
+    # Print the hyperparameter search logs summary
+    for trial in study.trials:
+        log_file = os.path.join(HYPERPARAMETER_SEARCH_LOGS, model_name, scheme_name, start_date_str, f'hyperparameter_search_trial_{trial.number}.jsonl')
+        if os.path.exists(log_file):
+            logs = read_logs(log_file)
+            print(f"\nTrial {trial.number} summary:")
+            if logs['evaluation']:
+                last_eval = logs['evaluation'][-1]
+                print(f"Final F1: {last_eval['eval_f1']:.4f} at step {last_eval['step']}")
+
     return study.best_trial
 
 def run_full_training(start_date_str, encoded_dataset):
     best_f1 = 0
     best_model_dir = None
     best_hyperparams = None
-    max_attempts = MAX_ATTEMPTS  # Number of attempts to try before stopping
+    max_attempts = MAX_ATTEMPTS
 
     for attempt in range(max_attempts):
         print(f"\n\033[91mAttempt {attempt + 1}...\033[0m")
-        if best_hyperparams is None:
-            print("\n\033[91mRunning hyperparameter search...\033[0m")
-            best_trial = run_hyperparameter_search(start_date_str, encoded_dataset)
-            attempt_hyperparams = best_trial.params
+        print("\n\033[91mRunning hyperparameter search...\033[0m")
+        
+        random_seed = random.randint(1, 10000)
+        print(f"Using random seed: {random_seed}")
+        
+        best_trial = run_hyperparameter_search(start_date_str, encoded_dataset, random_seed)
+        attempt_hyperparams = best_trial.params
         print(f"Using hyperparameters: {attempt_hyperparams}")
 
         output_dir = os.path.join(HYPERPARAMETER_SEARCH_LOGS, start_date_str)
         os.makedirs(output_dir, exist_ok=True)
         
-    
+        log_file = os.path.join(output_dir, f'training_logs_attempt_{attempt+1}.jsonl')
+        logging_callback = LoggingCallback(log_file=log_file)
+        
         training_args = TrainingArguments(
             output_dir=output_dir,
-            evaluation_strategy="epoch",
+            eval_strategy="epoch",
             save_strategy="epoch",
             per_device_eval_batch_size=128,
             load_best_model_at_end=True,
@@ -130,7 +148,8 @@ def run_full_training(start_date_str, encoded_dataset):
             push_to_hub=False,
             report_to=None,
             logging_dir=output_dir,
-            save_total_limit=2
+            save_total_limit=2,
+            seed=random_seed  # Set the seed for training
         )
 
         model = model_init().to(device)
@@ -140,7 +159,7 @@ def run_full_training(start_date_str, encoded_dataset):
             train_dataset=encoded_dataset["train"],
             eval_dataset=encoded_dataset["validate"],
             compute_metrics=compute_metrics,
-            callbacks=[EarlyStoppingCallback(early_stopping_patience=3)]
+            callbacks=[EarlyStoppingCallback(early_stopping_patience=3), logging_callback]
         )
         trainer.train() 
         test_result = trainer.evaluate(encoded_dataset["test"])
@@ -151,6 +170,15 @@ def run_full_training(start_date_str, encoded_dataset):
             best_model_dir = output_dir
             best_hyperparams = attempt_hyperparams
             print(f"New best F1 score: {best_f1} achieved on attempt {attempt + 1}")
+
+        # Print the training logs summary
+        logs = read_logs(log_file)
+        print("\nTraining Loss Summary:")
+        for entry in logs['training'][-5:]:  # Print the last 5 loss values
+            print(f"Step {entry['step']}: Loss = {entry['loss']:.4f}")
+        print("\nEvaluation F1 Summary:")
+        for entry in logs['evaluation'][-5:]:  # Print the last 5 F1 scores
+            print(f"Step {entry['step']}: F1 = {entry['eval_f1']:.4f}")
 
     if best_model_dir:
         save_best_model(model, start_date_str, best_f1, best_hyperparams)
@@ -180,9 +208,6 @@ def run_prediction_evaluation(start_date_train, encoded_pred_dataset):
     result = {'f1': pred_f1_score}
     print(json.dumps(result))
     return pred_f1_score
-
-
-
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Run model training and evaluation.")
@@ -231,7 +256,7 @@ def main(args):
     prediction_f1 = run_prediction_evaluation(start_date_train.strftime('%Y-%m-%d'), encoded_pred_dataset)
 
     # Announce the evaluation results
-    print(f"\nPrediction F1 score: {prediction_f1}")
+    print(f"\n\033[93mModel training completed for:\nTraining dataset: {start_date_train.strftime('%Y-%m-%d')} to {end_date_train.strftime('%Y-%m-%d')}\nPrediction dataset: {start_date_pred.strftime('%Y-%m-%d')} to {end_date_pred.strftime('%Y-%m-%d')}\nPrediction F1 score: {prediction_f1:.4f}\033[0m")
 
     # Concatenate the results to the dataframe
     res = pd.DataFrame([[start_date_train.strftime('%Y-%m-%d'), end_date_train.strftime('%Y-%m-%d'), 
@@ -241,6 +266,19 @@ def main(args):
     
     all_res = pd.concat([all_res, res], ignore_index=True)
     all_res.to_csv(all_res_file, index=False)
+
+    # Print the full training history
+    for attempt in range(MAX_ATTEMPTS):
+        log_file = os.path.join(HYPERPARAMETER_SEARCH_LOGS, args.start_date_train, f'training_logs_attempt_{attempt+1}.jsonl')
+        if os.path.exists(log_file):
+            print(f"\nFull training history for attempt {attempt+1}:")
+            logs = read_logs(log_file)
+            print("\nTraining Loss:")
+            for entry in logs['training']:
+                print(f"Step {entry['step']}: Loss = {entry['loss']:.4f}")
+            print("\nEvaluation F1 Scores:")
+            for entry in logs['evaluation']:
+                print(f"Step {entry['step']}: F1 = {entry['eval_f1']:.4f}")
 
 if __name__ == "__main__":
     args = parse_args()

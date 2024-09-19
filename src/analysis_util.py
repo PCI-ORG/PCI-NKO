@@ -1,8 +1,10 @@
 import os
+import re
 import sys
 from pathlib import Path
 import pandas as pd
 import numpy as np
+import random
 from datasets import load_from_disk
 import pyarrow as pa
 from model_config import *
@@ -53,6 +55,11 @@ translation_model = or_model3
 backup_model = or_model4
 analysis_model = or_model5
 
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key=openrouter_key,
+)
+
 #####################################################################
 
 ## 1. For plotting the results
@@ -77,7 +84,7 @@ def plot_results(df, event_dates, output_dir='../results/figures'):
     plot_df['year_month'] = plot_df['Pred End'].dt.strftime('%Y-%m')
 
     # Plot the results
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(12, 6), facecolor='white')
     sns.set_style("whitegrid")  # Use white background with grid
 
     ax = sns.lineplot(data=plot_df, x='Pred End', y='Test F1', label='Test F1', color='navy')
@@ -111,7 +118,7 @@ def plot_results(df, event_dates, output_dir='../results/figures'):
     plt.show()
 
     # Second plot to show the difference between the test and prediction F1
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(12, 6), facecolor='white')
     sns.set_style("whitegrid")  # Use white background with grid
 
     plot_df['F1 Diff'] = plot_df['Test F1'] - plot_df['Pred F1']
@@ -355,6 +362,21 @@ def RD_translate(text, primary_model=translation_model, backup_model=backup_mode
     
     return f"Error in translation: Failed with both models"
 
+def generate_counts(sample_df, all_policies):
+    fn_counts = sample_df[sample_df['prediction_type'] == 'FN']['Policy Area'].value_counts()
+    tn_counts = sample_df[sample_df['prediction_type'] == 'TN']['Policy Area'].value_counts()
+    
+    counts = []
+    
+    for policy in all_policies:
+        fn = fn_counts.get(policy, 0) 
+        tn = tn_counts.get(policy, 0)
+        total = fn + tn
+        counts.append((fn, total))
+    
+    return counts
+
+
 def calculate_false_omission_rate(df):
     grouped = df.groupby('Policy Area')
     false_omission_rates = grouped['prediction_type'].apply(lambda x: 
@@ -363,7 +385,7 @@ def calculate_false_omission_rate(df):
     )
     false_omission_rates = false_omission_rates.reindex(ALL_POLICY_AREAS, fill_value=0)
     # Convert series to dataframe
-    return false_omission_rates.reset_index(name='False Omission Rate')
+    return false_omission_rates
 
 # Note: Translation can take a long time (30 min for approx 500 rows).
 # This function is to resume the translation process from interrupted point.
@@ -479,6 +501,7 @@ def ensure_dir(file_path):
     directory = os.path.dirname(file_path)
     if not os.path.exists(directory):
         os.makedirs(directory)
+
 
 def plot_false_omission_rates(train_for, pred_for, train_counts, pred_counts, train_date_range, pred_date_range, pred_start_date):
     plt.rcdefaults()
