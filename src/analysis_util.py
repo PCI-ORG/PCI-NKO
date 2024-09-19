@@ -22,6 +22,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 load_dotenv()
+openrouter_key = os.getenv("OPENROUTER_API_KEY")ß
 
 # Define the policy areas
 ALL_POLICY_AREAS = [
