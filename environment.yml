@@ -1,4 +1,4 @@
-name: PCI-NKO-Test
+name: PCI-NKO
 channels:
   - defaults
   - conda-forge

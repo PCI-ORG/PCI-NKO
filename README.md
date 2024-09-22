@@ -1,3 +1,11 @@
+_Last updated on September 21, 2024._
+
+Website: [policychangeindex.org/overview-PCI-NKO.html](https://policychangeindex.org/overview-PCI-NKO.html)
+
+Authors: [Zhiqiang Ji](https://www.linkedin.com/in/zhiqiangji117/) and [Weifeng Zhong](https://www.weifengzhong.com)
+
+---------------------------------------------
+
 ## Introduction
 
 The Policy Change Index for North Korea (PCI-NKO) is an innovative project that aims to predict North Korea's policy changes by analyzing its state propaganda. The PCI-NKO utilizes deep learning and large language models (LLMs) to detect and interpret changes in how the Rodong Sinmun, North Korea's official newspaper, prioritizes different policies. The method involves the following steps:
@@ -28,7 +36,7 @@ For those familiar with Python projects, here's a quick guide to get started:
 3. Create and activate the Conda environment:
    ```
    conda env create -f environment.yml
-   conda activate pci-nko
+   conda activate PCI-NKO
    ```
 4. Install PyTorch and additional packages:
    - Visit [PyTorch official website](https://pytorch.org/get-started/locally/) to get the correct installation command for your system
@@ -67,7 +75,7 @@ Model training requires substantial VRAM. The scripts have been successfully tes
 
 If your system has less than 16GB VRAM, you may need to adjust the training parameters. Conversely, with more powerful hardware, you can increase the complexity of computations or parallel batch size. Training parameters can be modified in /src/model_config.py.
 
-**Note:** The training process requires significant disk space, primarily for generated logs. Depending on the size of your source data and training settings, the required disk space may vary considerably. Please allocate at least 15GB of free disk space, or adjust the logging configuration according to your training needs.
+**Note:** The training process requires significant disk space, primarily for generated logs. Depending on the size of your source data and training settings, the required disk space may vary considerably. Please allocate at least 15GB of free disk space or adjust the logging configuration according to your training needs.
 
 ### Environment Setup
 
@@ -127,13 +135,13 @@ By following these steps, you should have a working environment ready for runnin
 
 We assume the raw data is a CSV file where each item represents an article with its publication date, content, and whether it appeared on the front page (represented by 1 or 0).
 
-1. Create a `/data` folder in the root directory and place the raw data file (eg. `demo_set.csv`) inside it.
+1. Create a `/data` folder in the root directory and place the raw data file (e.g., `demo_set.csv`) inside it.
 2. Navigate to the `/src` directory and run:  
     ```bash
     python corpus_preparation.py
     ```
 This script converts the data into the Hugging Face datasets format, which is more suitable for model training. You'll need to input:
-- The path to the raw data file (eg. `../data/demo_set.csv`)
+- The path to the raw data file (e.g., `../data/demo_set.csv`)
 - The start date of the training window
 - The end date of the prediction window
 You can choose not to use all of your text data for a project. For instance, if the source file contains articles from 2018-01-01 to 2024-02-01, you have the option to study a specific period, such as 2022-01-01 to 2024-02-01. This flexibility enables focused analysis on particular time periods, which is especially useful when working with datasets that span long periods (e.g., [PCI-China](https://policychangeindex.org/overview-PCI-China.html) covers more than 70 years of data).
@@ -194,8 +202,14 @@ We use the Jupyter notebook `analysis.ipynb` for result analysis, providing grea
     - Generate English summaries
     - Tag articles, specifying the policy area they belong to
 3. **In-depth Episode Analysis**: For each noteworthy episode, compare the False Omission Rate (FOR) differences between various policy areas in the training window and the prediction window. This comparison helps identify focused policy areas. 
-4. **Focused Policy Area Analysis**: After identifying noteworthy policy areas, we zoom in further. Use LLMs to analyze the content of sample articles in these areas and generate a brief analysis report.
+4. **Focused Policy Area Analysis**: After identifying noteworthy policy areas, we zoom in further, use LLMs to analyze the content of sample articles in these areas, and generate a brief analysis report.
 
 For each episode, the LLM analysis results, including a FOR comparison chart and a report in docx format, are saved in the `/results/analysis_results/` directory.
 
-**Remember** that the LLM-generated analysis is not a substitute for domain knowledge and qualitative research. It is intended only as supplementary material for further investigation. It is not sufficient to draw any conclusions about North Korean policy changes. However, it may help researchers identify trends worth attention.
+**Remember** that the LLM-generated analysis is not a substitute for domain knowledge and qualitative research. It is intended only as supplementary material for further investigation. It alone is not sufficient to draw any conclusions about North Korean policy changes. However, it may help researchers identify trends worth closer attention.
+
+## Citing the PCI-NKO
+
+Please cite the source of the latest PCI-NKO by the website: https://policychangeindex.org.
+
+Please stay tune for our upcoming research paper on the subject.
