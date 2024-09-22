@@ -40,14 +40,26 @@ For those familiar with Python projects, here's a quick guide to get started:
    ```
 4. Install PyTorch and additional packages:
    - Visit [PyTorch official website](https://pytorch.org/get-started/locally/) to get the correct installation command for your system
-   - Run the PyTorch installation command, for example:
+   - For **macOS** platform:
+
+     ```
+     pip3 install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+     ```
+
+   - For **Windows** platform:
+
      ```
      pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
      ```
-   - Install additional required packages:
-     ```
-     pip install transformers accelerate datasets
-     ```
+
+    Readers can choose different versions according to their hardware environment.
+
+   - After installing PyTorch, install the following packages (we used these specific versions):
+
+   ```
+   pip install transformers==4.44.1 accelerate==0.34.2 datasets==3.0.0
+   ```
+
 4. Prepare the corpus:
    ```
    cd src
@@ -101,12 +113,37 @@ Copy `.env.sample` to `.env` and edit it to set your OpenRouter API Key or OpenA
     ```bash
     conda activate PCI-NKO
     ```     
-6. Install PyTorch (visit [PyTorch official website](https://pytorch.org/get-started/locally/) to get the correct installation command for your system)
+6. Install PyTorch Manually (please visit [PyTorch official website](https://pytorch.org/get-started/locally/) to get the correct installation command for your system):
+
+Detailed instructions:
+
+- **macOS Platform**
+
+  We chose the **Nightly** version for the latest [MPS support](https://developer.apple.com/metal/pytorch/):
+
+  ```bash
+  pip3 install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+  ```
+
+- **Windows Platform**
+
+  Since our CUDA driver version is **12.2**, we installed the PyTorch **Stable** version compatible with CUDA 12.1:
+
+  ```bash
+  pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+  ```
+
+  Readers can choose different versions according to their hardware environment.
+
 
 7. Install additional packages compatible with PyTorch:
     ```bash
     pip install transformers accelerate datasets
     ```
+    The specific versions used in our project are:
+    - transformers==4.44.1
+    - accelerate==0.34.2
+    - datasets==3.0.0
 
 8. Test the hardware configuration:
     ```bash
@@ -119,7 +156,7 @@ This will confirm whether you're using CUDA, Apple's Metal Performance Shaders (
 - **Note:** If CUDA devices are available, uncomment the last line in the .env file.
 
 
-For those who prefer using `pyenv` or Python's built-in `venv` for creating virtual environments, we also provide a `requirements.txt` file. You can use this as an alternative to the Conda setup (steps 1-5 above). After creating your virtual environment with [pyenv](https://github.com/pyenv/pyenv),  [pyenv-win](https://github.com/pyenv-win/pyenv-win), or [venv](https://docs.python.org/3/library/venv.html), you can install the required packages using:
+For those who prefer using `pyenv` or Python's built-in `venv` for creating virtual environments, we also provide a `requirements.txt` file. You can use this as an alternative to the Conda setup (steps 1-5 above). After creating your virtual environment with [pyenv](https://github.com/pyenv/pyenv),  [pyenv-win](https://github.com/pyenv-win/pyenv-win), or [venv](https://docs.python.org/3/library/venv.html) based on Python 3.12 or later,, you can install the required packages using:
 
 ```bash
 pip install -r requirements.txt

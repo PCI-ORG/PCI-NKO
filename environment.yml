@@ -3,25 +3,26 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - python=3.12
-  - python-dotenv
-  - python-dateutil
-  - pandas
-  - plotly
-  - optuna
-  - jupyterlab
-  - ipywidgets
-  - scikit-learn
-  - matplotlib
-  - seaborn
-  - nltk
-  - spacy
-  - tqdm
-  - pip
+  - python=3.12.5
+  - pandas=2.2.2
+  - pip=24.2
+  - plotly=5.24.1
+  - python-dateutil=2.9.0
+  - python-dotenv=0.21.0
+  - optuna=4.0.0
+  - jupyterlab=4.2.5
+  - ipywidgets=8.1.2
+  - nltk=3.9.1
+  - scikit-learn=1.5.1
+  - matplotlib=3.9.2
+  - seaborn=0.13.2
+  - spacy=3.7.2
+  - tqdm=4.66.5
   - pip:
-    - evaluate
-    - openai
-    - langchain
-    - sentence-transformers
-    - python-docx
+    - flake8==6.1.0
+    - evaluate==0.4.3
+    - openai==1.46.0
+    - langchain==0.3.0
+    - sentence-transformers==3.1.0
+    - python-docx==1.1.2
     # Add any additional pip packages if necessary

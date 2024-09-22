@@ -22,7 +22,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 load_dotenv()
-openrouter_key = os.getenv("OPENROUTER_API_KEY")ß
+openrouter_key = os.getenv("OPENROUTER_API_KEY")
 
 # Define the policy areas
 ALL_POLICY_AREAS = [
@@ -86,10 +86,13 @@ def plot_results(df, event_dates, output_dir='../results/figures'):
 
     # Plot the results
     plt.figure(figsize=(12, 6), facecolor='white')
-    sns.set_style("whitegrid")  # Use white background with grid
+    sns.set_style("white")  # 使用白色背景，不包含网格线
 
     ax = sns.lineplot(data=plot_df, x='Pred End', y='Test F1', label='Test F1', color='navy')
     sns.lineplot(data=plot_df, x='Pred End', y='Pred F1', label='Pred F1', color='crimson')
+
+    # 移除网格线
+    ax.grid(False)
 
     # Add vertical lines for important events and event descriptions
     y_min, y_max = ax.get_ylim()
@@ -120,10 +123,13 @@ def plot_results(df, event_dates, output_dir='../results/figures'):
 
     # Second plot to show the difference between the test and prediction F1
     plt.figure(figsize=(12, 6), facecolor='white')
-    sns.set_style("whitegrid")  # Use white background with grid
+    sns.set_style("white")  # 使用白色背景，不包含网格线
 
     plot_df['F1 Diff'] = plot_df['Test F1'] - plot_df['Pred F1']
     ax = sns.lineplot(data=plot_df, x='Pred End', y='F1 Diff')
+
+    # 移除网格线
+    ax.grid(False)
 
     # Add vertical lines for important events and event descriptions
     y_min, y_max = ax.get_ylim()
@@ -193,6 +199,7 @@ def extract_data_by_date_range(df, start_date, end_date, random_seed=None):
     
     if random_seed is not None:
         np.random.seed(random_seed)
+        
         filtered_df = filtered_df.sample(frac=1, random_state=random_seed)
         
     return filtered_df
@@ -506,7 +513,7 @@ def ensure_dir(file_path):
 
 def plot_false_omission_rates(train_for, pred_for, train_counts, pred_counts, train_date_range, pred_date_range, pred_start_date):
     plt.rcdefaults()
-    sns.set_style("whitegrid", {'axes.facecolor': 'white'})
+    sns.set_style("white", {'axes.facecolor': 'white'})
     
     fig, ax = plt.subplots(figsize=(16, 10), facecolor='white')
     
