@@ -112,6 +112,12 @@ def plot_results(df, event_dates, output_dir='../results/figures'):
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
     plt.xticks(rotation=45, ha='right', rotation_mode='anchor')
 
+    # Set y-axis ticks
+    ax.yaxis.set_major_locator(plt.MaxNLocator(10))   
+    ax.yaxis.set_major_formatter('{x:.3f}')          
+    plt.yticks(rotation=0, ha='right') 
+
+
     # Adjust the x-axis limits to show the desired time range
     ax.set_xlim([datetime(2022, 2, 1), datetime(2024, 4, 30)])
 
@@ -135,6 +141,24 @@ def plot_results(df, event_dates, output_dir='../results/figures'):
     ax.spines['bottom'].set_visible(True)
     ax.spines['bottom'].set_linewidth(1)
     ax.spines['bottom'].set_color('black')
+
+    # Configure y-axis tick parameters to protrude outward
+    ax.tick_params(
+        axis='y',
+        which='major',
+        direction='out',   # Tick direction outward (left)
+        length=5,          # Length of major ticks
+        width=1,           # Width of tick lines
+        colors='black',    # Color of tick lines
+        pad=2,             # Distance between tick labels and tick lines
+        left=True,         # Show ticks on the left
+        right=False        # Don't show ticks on the right
+    )
+    
+    # Ensure the left spine is visible and styled
+    ax.spines['left'].set_visible(True)
+    ax.spines['left'].set_linewidth(1)
+    ax.spines['left'].set_color('black')
 
     plt.tight_layout()  # Adjust the plot to ensure everything fits without overlapping
     plt.savefig(output_file_1, dpi=300, bbox_inches='tight', facecolor='white')  # Set facecolor to 'white'
@@ -167,6 +191,11 @@ def plot_results(df, event_dates, output_dir='../results/figures'):
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
     plt.xticks(rotation=45, ha='right', rotation_mode='anchor')
 
+    # Set y-axis ticks
+    ax.yaxis.set_major_locator(plt.MaxNLocator(10))   
+    ax.yaxis.set_major_formatter('{x:.3f}')          
+    plt.yticks(rotation=0, ha='right') 
+
     # Adjust the x-axis limits to show the desired time range
     ax.set_xlim([datetime(2022, 2, 1), datetime(2024, 4, 30)])
 
@@ -190,6 +219,24 @@ def plot_results(df, event_dates, output_dir='../results/figures'):
     ax.spines['bottom'].set_visible(True)
     ax.spines['bottom'].set_linewidth(1)
     ax.spines['bottom'].set_color('black')
+
+    # Configure y-axis tick parameters to protrude outward
+    ax.tick_params(
+        axis='y',
+        which='major',
+        direction='out',   # Tick direction outward (left)
+        length=5,          # Length of major ticks
+        width=1,           # Width of tick lines
+        colors='black',    # Color of tick lines
+        pad=2,             # Distance between tick labels and tick lines
+        left=True,         # Show ticks on the left
+        right=False        # Don't show ticks on the right
+    )
+
+    # Ensure the left spine is visible and styled
+    ax.spines['left'].set_visible(True)
+    ax.spines['left'].set_linewidth(1)
+    ax.spines['left'].set_color('black')
 
     plt.tight_layout()
     plt.savefig(output_file_2, dpi=300, bbox_inches='tight', facecolor='white')  # Set facecolor to 'white'
