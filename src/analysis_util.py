@@ -86,12 +86,12 @@ def plot_results(df, event_dates, output_dir='../results/figures'):
 
     # Plot the results
     plt.figure(figsize=(12, 6), facecolor='white')
-    sns.set_style("white")  # 使用白色背景，不包含网格线
+    sns.set_style("white")  
 
     ax = sns.lineplot(data=plot_df, x='Pred End', y='Test F1', label='Test F1', color='navy')
     sns.lineplot(data=plot_df, x='Pred End', y='Pred F1', label='Pred F1', color='crimson')
 
-    # 移除网格线
+    # Remove grids
     ax.grid(False)
 
     # Add vertical lines for important events and event descriptions
@@ -105,17 +105,36 @@ def plot_results(df, event_dates, output_dir='../results/figures'):
         ax.text(event_date, event_position, event_desc, rotation=0, ha='left', va='center', fontsize=8)
 
     plt.title('Test and Prediction F1 Over Time', fontsize=16)
-    plt.xlabel('Prediction End Date', fontsize=14)
     plt.ylabel('F1 Score', fontsize=14)
-    plt.xticks(rotation=45)
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-
-    # Set x-axis ticks to every two months
+    
+    # Set x-axis ticks to every two months and rotate labels
     ax.xaxis.set_major_locator(mdates.MonthLocator(interval=2))
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    plt.xticks(rotation=45, ha='right', rotation_mode='anchor')
 
     # Adjust the x-axis limits to show the desired time range
     ax.set_xlim([datetime(2022, 2, 1), datetime(2024, 4, 30)])
+
+    # Remove x-axis label
+    ax.set_xlabel('')
+
+    # Configure tick lines to protrude downward
+    ax.tick_params(
+        axis='x',
+        which='major',
+        direction='out',   # Tick direction outward (downward)
+        length=5,         # Length of major ticks
+        width=1,           # Width of tick lines
+        colors='black',    # Color of tick lines
+        pad=2,             # Distance between tick labels and tick lines
+        bottom=True,       # Show ticks at the bottom
+        top=False          # Don't show ticks at the top
+    )
+
+    # Ensure the bottom spine is visible and styled
+    ax.spines['bottom'].set_visible(True)
+    ax.spines['bottom'].set_linewidth(1)
+    ax.spines['bottom'].set_color('black')
 
     plt.tight_layout()  # Adjust the plot to ensure everything fits without overlapping
     plt.savefig(output_file_1, dpi=300, bbox_inches='tight', facecolor='white')  # Set facecolor to 'white'
@@ -123,12 +142,11 @@ def plot_results(df, event_dates, output_dir='../results/figures'):
 
     # Second plot to show the difference between the test and prediction F1
     plt.figure(figsize=(12, 6), facecolor='white')
-    sns.set_style("white")  # 使用白色背景，不包含网格线
+    sns.set_style("white")  
 
     plot_df['F1 Diff'] = plot_df['Test F1'] - plot_df['Pred F1']
     ax = sns.lineplot(data=plot_df, x='Pred End', y='F1 Diff')
 
-    # 移除网格线
     ax.grid(False)
 
     # Add vertical lines for important events and event descriptions
@@ -143,19 +161,39 @@ def plot_results(df, event_dates, output_dir='../results/figures'):
 
     plt.ylabel('Policy Change Index for North Korea', fontsize=14)
     plt.axhline(0, color='red', linestyle='--')  # Add a horizontal line at 0
-    plt.xticks(rotation=45)
-
-    # Set x-axis ticks to every two months
+    
+    # Set x-axis ticks to every two months and rotate labels
     ax.xaxis.set_major_locator(mdates.MonthLocator(interval=2))
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    plt.xticks(rotation=45, ha='right', rotation_mode='anchor')
 
     # Adjust the x-axis limits to show the desired time range
     ax.set_xlim([datetime(2022, 2, 1), datetime(2024, 4, 30)])
 
+    # Remove x-axis label
+    ax.set_xlabel('')
+
+    # Configure tick lines to protrude downward
+    ax.tick_params(
+        axis='x',
+        which='major',
+        direction='out',   # Tick direction outward (downward)
+        length=5,         # Length of major ticks
+        width=1,           # Width of tick lines
+        colors='black',    # Color of tick lines
+        pad=2,             # Distance between tick labels and tick lines
+        bottom=True,       # Show ticks at the bottom
+        top=False          # Don't show ticks at the top
+    )
+
+    # Ensure the bottom spine is visible and styled
+    ax.spines['bottom'].set_visible(True)
+    ax.spines['bottom'].set_linewidth(1)
+    ax.spines['bottom'].set_color('black')
+
     plt.tight_layout()
     plt.savefig(output_file_2, dpi=300, bbox_inches='tight', facecolor='white')  # Set facecolor to 'white'
     plt.show()
-
 
 ########################################################### 
 ## 2. LLM analysis

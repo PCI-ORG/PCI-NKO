@@ -265,7 +265,7 @@ def main(args):
                          columns=['Train Start', 'Train End', 'Pred Start', 'Pred End', 'Test F1', 'Pred F1'])
     
     all_res = pd.concat([all_res, res], ignore_index=True)
-    all_res['PCI'] = (all_res['Test F1'] - all_res['Pred F1'])
+    all_res['PCI'] = abs((all_res['Test F1'] - all_res['Pred F1']))
     all_res.to_csv(all_res_file, index=False)
 
     # Print the full training history
